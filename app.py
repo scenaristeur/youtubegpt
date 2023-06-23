@@ -15,12 +15,37 @@ verbose = True
 
 # App framework
 st.title('🦜️🔗 Createur de scripts Youtube')
+
+
+from streamlit.components.v1 import html
+
+button = """
+<script type="text/javascript"
+ src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" 
+ data-name="bmc-button" data-slug="SqdOnMgfw" data-color="#FFDD00" data-emoji="" 
+   data-font="Cookie" data-text="Offre-nous un thé !" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+"""
+
+html(button, height=70, width=220)
+
+st.markdown(
+    """
+    <style>
+        iframe[width="220"] {
+            position: fixed;
+            bottom: 60px;
+            right: 40px;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
 openai_api_key = st.sidebar.text_input("Votre clé d'API OpenAI")
 prompt = st.text_input('Saisissez le sujet de votre vidéo Youtube ici')
 
-if not openai_api_key.startswith('sk-'):
-    st.warning("Veuillez entrer votre clé d'API OpenAI!", icon='⚠')
-    st.warning("https://platform.openai.com/account/api-keys", icon='⚠')
+
 
 
 # Prompt templates
@@ -42,32 +67,40 @@ script_memory = ConversationBufferMemory(
 
 
 # Llms
-llm = OpenAI(temperature=0.9, openai_api_key=openai_api_key)
-title_chain = LLMChain(llm=llm, prompt=title_template,
+if not openai_api_key.startswith('sk-'):
+    st.warning("Veuillez entrer votre clé d'API OpenAI et la copier dans la sidebar à gauche. Elle est disponible sur https://platform.openai.com/account/api-keys.", icon='⚠')
+else:
+    llm = OpenAI(temperature=0.9, openai_api_key=openai_api_key)
+    title_chain = LLMChain(llm=llm, prompt=title_template,
                        verbose=verbose, output_key='title', memory=title_memory)
-script_chain = LLMChain(llm=llm, prompt=script_template,
+    script_chain = LLMChain(llm=llm, prompt=script_template,
                         verbose=verbose, output_key='script', memory=script_memory)
 
-wiki = WikipediaAPIWrapper(lang='fr')
+    wiki = WikipediaAPIWrapper(lang='fr')
 
 # sequential_chain = SequentialChain(chains=[title_chain, script_chain], input_variables=[
 #                                    'topic'], output_variables=['title', 'script'], verbose=verbose)
 
 
 # show stuff to the screen if there is a prompt
-if prompt:
-    title = title_chain.run(prompt)
-    wiki_research = wiki.run(prompt)
-    script = script_chain.run(title=title, wikipedia_research=wiki_research)
-    # response = sequential_chain({'topic': prompt})
-    st.write(title)
-    st.write(script)
+    if prompt:
+        title = title_chain.run(prompt)
+        wiki_research = wiki.run(prompt)
+        script = script_chain.run(title=title, wikipedia_research=wiki_research)
+        # response = sequential_chain({'topic': prompt})
+        st.write(title)
+        st.write(script)
 
-    with st.expander('Historique des titres'):
-        st.info(title_memory.buffer)
+        with st.expander('Historique des titres'):
+            st.info(title_memory.buffer)
 
-    with st.expander('Historique des messages'):
-        st.info(script_memory.buffer)
+        with st.expander('Historique des messages'):
+            st.info(script_memory.buffer)
 
-    with st.expander('Historique des recherches wikipedia'):
-        st.info(wiki_research)
+        with st.expander('Historique des recherches wikipedia'):
+            st.info(wiki_research)
+
+st.info("N'oubliez pas de nous soutenir en nous offrant un thé ou un livre en cliquant sur le bouton jaune en bas à droite !)")
+st.info("Idées et suggestions https://github.com/scenaristeur/youtubegpt/issues")
+
+st.video('https://youtu.be/25dbMirBY04')

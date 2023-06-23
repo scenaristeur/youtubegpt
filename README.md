@@ -1,6 +1,9 @@
 
 # Youtube generation de script
+https://youtube-script-createur.streamlit.app/
 
+
+[![Youtube script generateur en français](https://img.youtube.com/vi/25dbMirBY04/0.jpg)](https://youtu.be/25dbMirBY04)
 
 # install dependencies
 `pip3 install streamlit langchain openai wikipedia chromadb tiktoken`
