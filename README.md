@@ -38,3 +38,7 @@ if prompt:
     response = llm(prompt)
     st.write(response)
 `
+
+# hosting
+- https://blog.streamlit.io/host-your-streamlit-app-for-free/
+- https://blog.streamlit.io/langchain-tutorial-1-build-an-llm-powered-app-in-18-lines-of-code/

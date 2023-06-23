@@ -1,21 +1,27 @@
 # Bring deps
 import os
-from apikey import apikey
+#from apikey import apikey
 
 import streamlit as st
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain, SequentialChain
+from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.utilities import WikipediaAPIWrapper
 
 
-os.environ['OPENAI_API_KEY'] = apikey
+#os.environ['OPENAI_API_KEY'] = apikey
 verbose = True
 
 # App framework
 st.title('🦜️🔗 Createur de scripts Youtube')
+openai_api_key = st.sidebar.text_input("Votre clé d'API OpenAI")
 prompt = st.text_input('Saisissez le sujet de votre vidéo Youtube ici')
+
+if not openai_api_key.startswith('sk-'):
+    st.warning("Veuillez entrer votre clé d'API OpenAI!", icon='⚠')
+    st.warning("https://platform.openai.com/account/api-keys", icon='⚠')
+
 
 # Prompt templates
 title_template = PromptTemplate(
@@ -36,7 +42,7 @@ script_memory = ConversationBufferMemory(
 
 
 # Llms
-llm = OpenAI(temperature=0.9)
+llm = OpenAI(temperature=0.9, openai_api_key=openai_api_key)
 title_chain = LLMChain(llm=llm, prompt=title_template,
                        verbose=verbose, output_key='title', memory=title_memory)
 script_chain = LLMChain(llm=llm, prompt=script_template,
